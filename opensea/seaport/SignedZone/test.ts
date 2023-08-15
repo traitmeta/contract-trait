@@ -1,5 +1,5 @@
 import { keccak256, recoverAddress, toUtf8Bytes } from "ethers/lib/utils";
-import { ethers, Wallet, utils } from "ethers";
+import { ethers, Wallet, utils, provider } from "ethers";
 import { assert } from "console";
 
 const ZoneContractAddress = "";
@@ -20,12 +20,17 @@ const signedOrderType = {
   ],
 };
 
+// TODO replace
+const signer = new ethers.Wallet("部署合约时候设置的签名用户的私钥", provider);
+// TODO replace
+const domainSeparator = "从Zone合约获取";
+
 const convertSignatureToEIP2098 = (signature: string) => {
   if (signature.length === 130) {
     return signature;
   }
 
-  assert(signature.length == 132, "signature must be 64 or 65 bytes");
+  assert(signature.length === 132, "signature must be 64 or 65 bytes");
   return utils.splitSignature(signature).compact;
 };
 
@@ -62,8 +67,6 @@ const calculateSignedOrderHash = (
 const signOrder = async (
   orderHash: string,
   context: string = "0x",
-  signer: Wallet,
-  domainSeparator: string,
   fulfiller = ethers.constants.AddressZero,
   secondsUntilExpiration = 60
 ) => {
@@ -76,7 +79,7 @@ const signOrder = async (
   );
 
   signature = convertSignatureToEIP2098(signature);
-  assert(signature.length == 2 + 64 * 2, "signature errer of length"); // 0x + 64 bytes
+  assert(signature.length === 2 + 64 * 2, "signature errer of length"); // 0x + 64 bytes
 
   const signedOrderHash = calculateSignedOrderHash(
     fulfiller,
@@ -89,13 +92,22 @@ const signOrder = async (
   );
 
   const recoveredAddress = recoverAddress(digest, signature);
-  assert(recoveredAddress == signer.address, "recover address error");
+  assert(recoveredAddress === signer.address, "recover address error");
 
   // extraData to be set on the order, according to SIP-7
-  const extraData = `0x${fulfiller.slice(2)}${toPaddedBytes(
+  const extraData = `0x00${fulfiller.slice(2)}${toPaddedBytes(
     expiration,
     8
   )}${signature.slice(2)}${context.slice(2)}`;
 
   return { signature, expiration, extraData };
 };
+
+(async () => {
+  const signedData = await signOrder(
+    "TODO 需要签名的订单哈希",
+    "Context内容",
+    "fulfiller地址"
+  );
+  console.log(signedData.extraData);
+})();
