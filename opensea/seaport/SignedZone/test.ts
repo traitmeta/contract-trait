@@ -1,5 +1,5 @@
 import { keccak256, recoverAddress, toUtf8Bytes } from "ethers/lib/utils";
-import { ethers, Wallet, utils, provider } from "ethers";
+import { ethers, utils } from "ethers";
 import { assert } from "console";
 
 const ZoneContractAddress = "";
@@ -21,7 +21,7 @@ const signedOrderType = {
 };
 
 // TODO replace
-const signer = new ethers.Wallet("部署合约时候设置的签名用户的私钥", provider);
+const signer = new ethers.Wallet("部署合约时候设置的签名用户的私钥");
 // TODO replace
 const domainSeparator = "从Zone合约获取";
 
