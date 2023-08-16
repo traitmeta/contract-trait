@@ -36,3 +36,8 @@
 3. context这个表示子协议，如果是00开头，类型就是1，表示 `required identifier for first returned received item`，也就是一个uint256;
     - context = version + value
     - 本次支持的context = 00 + uint256(identifier)，如果是native和ERC20支付，那么identifier是0
+
+
+## 还没有搞清楚的点
+1. 可以发现offer提供报价，ZONE signer会对Offer订单进行签名生成extraData， ~~那么offer报价者已经进行了签名操作，为什么还需要ZONE的签名和extraData?~~
+    - 目前不使用Zone进行测试，发现一样可以成交，就是不能0gas取消报价
