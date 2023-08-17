@@ -38,6 +38,21 @@
     - 本次支持的context = 00 + uint256(identifier)，如果是native和ERC20支付，那么identifier是0
 
 
-## 还没有搞清楚的点
+## 问答
 1. 可以发现offer提供报价，ZONE signer会对Offer订单进行签名生成extraData， ~~那么offer报价者已经进行了签名操作，为什么还需要ZONE的签名和extraData?~~
     - 目前不使用Zone进行测试，发现一样可以成交，就是不能0gas取消报价
+2. 接受报价或者接受拍卖出价，如果构造好数据，但是发送交易的用户不是本人是否可行？
+    - 不行，会执行失败
+    - 在_verfuSignature中会进行判断
+        ```solidity
+            // Determine whether the offerer is the caller.
+            bool offererIsCaller;
+            assembly {
+                offererIsCaller := eq(offerer, caller())
+            }
+
+            // Skip signature verification if the offerer is the caller.
+            if (offererIsCaller) {
+                return;
+            }
+        ```
